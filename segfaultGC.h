@@ -3,13 +3,14 @@
 
 # include <stdlib.h>
 
-typedef struct s_sfgc
+typedef struct s_gc
 {
 	void			*buffer;
-	struct	s_sfgc	*next;
-}s_sfgc;
+	struct	s_gc	*next;
+}t_gc;
 
-void	*malloc_GC(size_t size);
-void	free_all_GC(void);
+void	*gc_malloc(size_t size);
+void	gc_free(void *buffer);
+void	gc_free_all(void);
 
 #endif

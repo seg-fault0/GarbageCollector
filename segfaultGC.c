@@ -1,15 +1,15 @@
 #include "segfaultGC.h"
 
-s_sfgc	*add_to_list(void *new)
+t_gc	*add_to_list(void *new)
 {
-	static s_sfgc	*start;
-	static s_sfgc	*old;
+	static t_gc	*start;
+	static t_gc	*old;
 	static int		first_call;
-	s_sfgc			*new_node;
+	t_gc			*new_node;
 
 	if(!new)
 		return (start);
-	new_node = malloc(sizeof(s_sfgc));
+	new_node = malloc(sizeof(t_gc));
 	new_node->buffer = new;
 	if(first_call == 0)
 	{
@@ -25,7 +25,7 @@ s_sfgc	*add_to_list(void *new)
 	return (NULL);
 }
 
-void	*malloc_GC(size_t size)
+void	*gc_malloc(size_t size)
 {
 	void	*new;
 
@@ -36,10 +36,36 @@ void	*malloc_GC(size_t size)
 	return (new);
 }
 
-void	free_all_GC(void)
+void	gc_free(void *buffer)
 {
-	s_sfgc	*start = add_to_list(NULL);
-	s_sfgc	*tmp;
+	t_gc	*start;
+	t_gc	*prev;
+	t_gc	*current;
+
+	start = add_to_list(NULL);
+	prev = NULL;
+	current = start;
+	while (current)
+	{
+		if (current->buffer == buffer)
+		{
+			if (prev)
+				prev->next = current->next;
+			else
+				start = current->next;
+			free(current->buffer);
+			free(current);
+			return ;
+		}
+		prev = current;
+		current = current->next;
+	}
+}
+
+void	gc_free_all(void)
+{
+	t_gc	*start = add_to_list(NULL);
+	t_gc	*tmp;
 	while(start ->next != NULL)
 	{
 		tmp = start;
